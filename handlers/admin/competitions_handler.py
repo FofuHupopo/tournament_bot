@@ -17,20 +17,34 @@ from states import (
 from keyboards import go_back_keyboard, admin_competition_keyboard, admin_competition_detail_keyboard
 
 
-@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_competitions")
-async def competitions_handler(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    
+async def competitions_view(message: types.Message, edit=False):
     with Session(engine) as session:
         competitions = session.query(CompetitionModel).all()
         
         temp_competition_keyboard = copy.deepcopy(admin_competition_keyboard)
-    
-        for ind, competition in enumerate(competitions, 1):
-            competition_btn = InlineKeyboardButton(f"{ind}. {competition.name}", callback_data=f"admin_competition__{competition.id}")
-            temp_competition_keyboard.add(competition_btn)
 
-    await callback_query.message.edit_text(MESSAGES["competition_menu"], reply_markup=temp_competition_keyboard)
+        btns = []
+        
+        for ind, competition in enumerate(competitions, 1):
+            btns.append(InlineKeyboardButton(f"{ind}. {competition.name}", callback_data=f"admin_competition__{competition.id}"))
+        
+        temp_competition_keyboard.add(*btns)
+        
+        temp_competition_keyboard.add(
+            InlineKeyboardButton("◀️ Назад", callback_data="admin")
+        )
+
+    if edit:
+        await message.edit_text(MESSAGES["competition_menu"], reply_markup=temp_competition_keyboard)
+    else:
+        await bot.send_message(message.from_user.id, MESSAGES["competition_menu"], reply_markup=temp_competition_keyboard)
+
+
+@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_competitions")
+async def competitions_handler(callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+    
+    await competitions_view(callback_query.message, True)
 
 
 # Add Competition
@@ -115,10 +129,25 @@ async def create_competition(message: types.Message, state: FSMContext):
 
     await state.finish()
     await message.answer("Новое событие было создано.", reply_markup=ReplyKeyboardRemove())
-    await admin_handler(message)
+    await competitions_view(message)
 
 
 # Competition detail
+
+
+async def competiotion_detail_view(message: types.Message, competition_id: int, edit=False):
+    with Session(engine) as session:
+        competition = session.query(CompetitionModel).filter(CompetitionModel.id == competition_id).first()
+        registrations = session.query(RegistrationModel).filter(RegistrationModel.competition_id == competition_id).count()
+        accepted_registrations = session.query(RegistrationModel).filter(RegistrationModel.competition_id == competition_id, RegistrationModel.is_accepted == True).count()
+        
+        text = f"{competition.name}\n\n{competition.description}\n\n🗓Дата: {competition.date}\n\n👥Максимальное кол-во игроков: {competition.max_participants}\n\n💌Заявок: {registrations}\n\n✅Принятых заявок: {accepted_registrations}"
+    
+    if edit:
+        await message.edit_text(text, reply_markup=admin_competition_detail_keyboard)
+    else:
+        await message.reply(text, reply_markup=admin_competition_detail_keyboard)
+
 
 @dp.callback_query_handler(AdminFilter(), lambda cmd: "admin_competition__" in cmd.data, state="*")
 async def competition_detail_handler(callback_query: types.CallbackQuery, state: FSMContext):
@@ -126,17 +155,9 @@ async def competition_detail_handler(callback_query: types.CallbackQuery, state:
     
     competition_id = callback_query.data.split("__")[-1]
     
-    with Session(engine) as session:
-        competition = session.query(CompetitionModel).filter(CompetitionModel.id == competition_id).first()
-        registrations = session.query(RegistrationModel).filter(RegistrationModel.competition_id == competition_id).count()
-        accepted_registrations = session.query(RegistrationModel).filter(RegistrationModel.competition_id == competition_id, RegistrationModel.is_accepted == True).count()
-        
-        text = f"Событие: {competition.name}\n{competition.description}\nДата: {competition.date}\nМаксимальное кол-во игроков: {competition.max_participants}\nЗаявок: {registrations}\nПринятых заявок: {accepted_registrations}"
-        
     await CompetitionDetailState.competition_id.set()
     await state.update_data(competition_id=competition_id)
-    
-    await callback_query.message.edit_text(text, reply_markup=admin_competition_detail_keyboard)
+    await competiotion_detail_view(callback_query.message, competition_id, True)
 
 
 @dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_go_back_competitions", state=CompetitionDetailState.competition_id)
@@ -161,6 +182,7 @@ async def competition_detail_handler(callback_query: types.CallbackQuery, state:
     
     await state.finish()
     
+    await bot.send_message(callback_query.from_user.id, f"Событие было удалено")
     await competitions_handler(callback_query)
 
 
@@ -173,7 +195,7 @@ async def edit_competition_name_handler(callback_query: types.CallbackQuery, sta
     
     await CompetitionDetailState.name.set()
     
-    await bot.send_message(callback_query.from_user.id, "Введите новое название для события")
+    await bot.send_message(callback_query.from_user.id, "Введите новое название для события.")
 
 
 @dp.message_handler(AdminFilter(), state=CompetitionDetailState.name)
@@ -184,11 +206,67 @@ async def edit_competition_name(message: types.Message, state: FSMContext):
     with Session(engine) as session:
         competition = session.query(CompetitionModel).filter(CompetitionModel.id == competition_id).first()
         competition.name = message.text
-        
-        session.add(competition)
+
+        session.merge(competition)
         session.commit()
     
-    await state.finish()
+    await CompetitionDetailState.competition_id.set()
     
-    # await bot.send_message(message.from_user.id, f"Установлено \"{message.text}\" название для этого события.")
-    await bot.call_back_query_handler(competitions_handler)()
+    await bot.send_message(message.from_user.id, f"Установлено название \"{message.text}\" для этого события.")
+    await competiotion_detail_view(message, competition_id)
+
+
+@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_competition_edit_description", state=CompetitionDetailState.competition_id)
+async def edit_competition_description_handler(callback_query: types.CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(callback_query.id)
+    
+    await CompetitionDetailState.description.set()
+    
+    await bot.send_message(callback_query.from_user.id, "Введите новое описание для события.")
+
+
+@dp.message_handler(AdminFilter(), state=CompetitionDetailState.description)
+async def edit_competition_description(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        competition_id = data["competition_id"]
+    
+    with Session(engine) as session:
+        competition = session.query(CompetitionModel).filter(CompetitionModel.id == competition_id).first()
+        competition.description = message.text
+
+        session.merge(competition)
+        session.commit()
+    
+    await CompetitionDetailState.competition_id.set()
+    
+    await bot.send_message(message.from_user.id, f"Установлено новое описание для этого события.")
+    await competiotion_detail_view(message, competition_id)
+
+
+@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_competition_reschedule", state=CompetitionDetailState.competition_id)
+async def edit_competition_date_handler(callback_query: types.CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(callback_query.id)
+    
+    await CompetitionDetailState.date.set()
+    
+    await bot.send_message(callback_query.from_user.id, "Введите дату проведения нового события в формате \"День.Месяц.Год Час:Минуты\", например, \"01.01.2000 10:00\".")
+
+
+@dp.message_handler(AdminFilter(), state=CompetitionDetailState.date)
+async def edit_competition_date(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        competition_id = data["competition_id"]
+        
+    new_date = datetime.strptime(message.text, "%d.%m.%Y %H:%M")
+    
+    with Session(engine) as session:
+        session.query(CompetitionModel).filter(CompetitionModel.id == competition_id).update({
+            CompetitionModel.date: new_date
+        })
+
+        session.commit()
+    
+    await CompetitionDetailState.competition_id.set()   
+    
+    await bot.send_message(message.from_user.id, f"Установлена дата \"{new_date.__str__()}\" для этого события.")
+    await competiotion_detail_view(message, competition_id)

@@ -10,6 +10,11 @@ from aiogram import types
 @dp.message_handler(AdminFilter(), commands=['admin'])
 async def admin_handler(message: types.Message):
     await message.reply(MESSAGES["admin"], reply_markup=admin_keyboard)
+
+
+@dp.callback_query_handler(lambda cb: cb.data == "admin")
+async def admin_callback(callback_query: types.CallbackQuery):
+    await callback_query.message.edit_text(MESSAGES["admin"], reply_markup=admin_keyboard)
     
 
 @dp.message_handler(AdminFilter(), filters.Text(equals='Выйти', ignore_case=True), state='*')

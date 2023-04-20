@@ -74,25 +74,39 @@ async def create_rcon_rule(message: types.Message, state: FSMContext):
 
     await state.finish()
     await message.answer("Новое RCON подключение было создано.", reply_markup=ReplyKeyboardRemove())
-    await admin_handler(message)
+    await rcon_menu_view(message)
     
 
 # RCON Management
 
-@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_rcon")
-async def rcon_menu_handler(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    
+async def rcon_menu_view(message: types.Message, edit=False):
     with Session(engine) as session:
         rcon_rules = session.query(RconRuleModel).all()
         
         temp_rcon_keyboard = copy.deepcopy(rcon_keyboard)
+        
+        btns = []
     
         for ind, rule in enumerate(rcon_rules, 1):
-            add_rcon_btn = InlineKeyboardButton(f"{ind}. {rule.name}", callback_data=f"admin_rcon_conn__{rule.name}")
-            temp_rcon_keyboard.add(add_rcon_btn)
+            btns.append(InlineKeyboardButton(f"{ind}. {rule.name}", callback_data=f"admin_rcon_conn__{rule.name}"))
+        
+        temp_rcon_keyboard.add(*btns)
+        
+        temp_rcon_keyboard.add(
+            InlineKeyboardButton("◀️ Назад", callback_data="admin")
+        )
 
-    await callback_query.message.edit_text(MESSAGES["rcon_menu"], reply_markup=temp_rcon_keyboard)
+    if edit:
+        await message.edit_text(MESSAGES["rcon_menu"], reply_markup=temp_rcon_keyboard)
+    else:
+        await bot.send_message(message.from_user.id, MESSAGES["rcon_menu"], reply_markup=temp_rcon_keyboard)
+
+
+@dp.callback_query_handler(AdminFilter(), lambda cmd: cmd.data == "admin_rcon")
+async def rcon_menu_handler(callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+
+    await rcon_menu_view(callback_query.message, True)
 
 
 @dp.callback_query_handler(AdminFilter(), lambda cmd: "admin_rcon_conn__" in cmd.data, state=None)
