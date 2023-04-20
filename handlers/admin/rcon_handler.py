@@ -21,7 +21,7 @@ async def start_add_rcon_rule(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     
     await AddRconRuleState.name.set()
-    await bot.send_message(chat_id=callback_query.from_user.id, text="Введите название нового RCON подключения.", reply_markup=go_back_keyboard)
+    await bot.send_message(callback_query.from_user.id, text="Введите название нового RCON подключения.", reply_markup=go_back_keyboard)
 
 
 @dp.message_handler(AdminFilter(), state=AddRconRuleState.name)
@@ -92,7 +92,7 @@ async def rcon_menu_handler(callback_query: types.CallbackQuery):
             add_rcon_btn = InlineKeyboardButton(f"{ind}. {rule.name}", callback_data=f"admin_rcon_conn__{rule.name}")
             temp_rcon_keyboard.add(add_rcon_btn)
 
-    await callback_query.message.edit_text(MESSAGES["admin_rcon_menu"], reply_markup=temp_rcon_keyboard)
+    await callback_query.message.edit_text(MESSAGES["rcon_menu"], reply_markup=temp_rcon_keyboard)
 
 
 @dp.callback_query_handler(AdminFilter(), lambda cmd: "admin_rcon_conn__" in cmd.data, state=None)

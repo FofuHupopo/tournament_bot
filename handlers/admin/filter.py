@@ -11,4 +11,5 @@ class AdminFilter(filters.Filter):
             user = session.query(UserModel).filter(UserModel.telegram_id == message.from_user.id).first()
             
             # return user and user.is_admin
+
             return True

@@ -7,20 +7,37 @@ from keyboards import start_keyboard, join_keyboard, main_keyboard
 
 
 @dp.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
-    await message.reply(MESSAGES["start"], reply_markup=start_keyboard)
-
-
-@dp.callback_query_handler(lambda cmd: cmd.data == "confirm_rules")
-async def confirm_rules_btn(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    
+async def welcome_handler(message: types.Message):
     with Session(engine) as session:
-        exists = session.query(
-            session.query(UserModel).filter_by(telegram_id=callback_query.message.chat.id).exists()
-        ).scalar()
-        
-        if exists:
-            await callback_query.message.edit_text(MESSAGES["already_registered"])
+        user = session.query(UserModel).filter(UserModel.telegram_id == message.from_user.id).first()
+    
+        if user:
+            await main_handler(message)
         else:
-            await callback_query.message.edit_text(MESSAGES["main_menu"], reply_markup=main_keyboard)
+            await message.reply(MESSAGES["start"], reply_markup=start_keyboard)
+
+
+@dp.message_handler(commands=["menu"])
+async def main_handler(message: types.Message):
+    with Session(engine) as session:
+        user = session.query(UserModel).filter(UserModel.telegram_id == message.from_user.id).first()
+    
+        if user:
+            await message.reply(MESSAGES["main_menu"], reply_markup=main_keyboard)
+        else:
+            await welcome_handler(message)
+
+
+# @dp.callback_query_handler(lambda cmd: cmd.data == "confirm_rules")
+# async def confirm_rules_btn(callback_query: types.CallbackQuery):
+#     await bot.answer_callback_query(callback_query.id)
+    
+#     with Session(engine) as session:
+#         exists = session.query(
+#             session.query(UserModel).filter_by(telegram_id=callback_query.message.chat.id).exists()
+#         ).scalar()
+        
+#         if exists:
+#             await callback_query.message.edit_text(MESSAGES["already_registered"])
+#         else:
+#             await callback_query.message.edit_text(MESSAGES["main_menu"], reply_markup=main_keyboard)

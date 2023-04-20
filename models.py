@@ -18,8 +18,8 @@ class UserModel(Base):
     name = Column(String(127))
     surname = Column(String(127))
     
-    class_letter = Column(String(1))
     class_number = Column(Integer)
+    class_letter = Column(String(1))
     
     is_active = Column(Boolean(True))
     is_admin = Column(Boolean(False))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import json
+import os
 from datetime import datetime
 
 from aiogram import Bot, Dispatcher, executor
@@ -8,7 +9,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 
 MESSAGES = json.load(open("messages.json", encoding="utf8"))
-API_TOKEN = "2018923142:AAGZWUnihB0GXC9F-qlzMd1jVEmQ9138PmM"
+# API_TOKEN = os.getenv("BOT_TOKEN")
+API_TOKEN = "2018923142:AAFRTQXsNLs2GTCR7rVEnSpzo4el1fl7m7E"
 
 logging.basicConfig(level=logging.INFO) #, filename=f"./logs/log-{datetime.utcnow():%Y-%m-%d_%H:%M:%S}.txt")
 

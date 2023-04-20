@@ -21,3 +21,28 @@ class AddRconRuleState(StatesGroup):
     server_ip = State()
     server_port = State()
     password = State()
+
+
+class CompetitionDetailState(StatesGroup):
+    competition_id = State()
+    name = State()
+    description = State()
+    date = State()
+
+
+class AddCompetitionState(StatesGroup):
+    name = State()
+    description = State()
+    game = State()
+    server = State()
+    max_participants = State()
+    date = State()
+
+
+class UserSignupState(StatesGroup):
+    mail = State()
+    surname = State()
+    name = State()
+    class_number = State()
+    class_letter = State()
+    
