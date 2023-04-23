@@ -4,7 +4,7 @@ from datetime import datetime
 from aiogram import types
 from sqlalchemy.orm import Session
 
-from bot import dp, bot, MESSAGES
+from bot import dp, bot
 from models import engine, CompetitionModel, RegistrationModel, UserModel
 from states import RegistrationState
 from handlers.main_handlers import main_handler
@@ -87,10 +87,13 @@ async def competiotion_list(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     
     with Session(engine) as session:
-        competition_id = session.query(CompetitionModel).filter(CompetitionModel.date >= datetime.now()).order_by(CompetitionModel.id).first().id
-    
-    await view_competition(callback_query, competition_id)
-    
+        competition = session.query(CompetitionModel).filter(CompetitionModel.date >= datetime.now()).order_by(CompetitionModel.id).first()
+        
+        if competition:
+            await view_competition(callback_query, competition.id)
+        else:
+            await bot.send_message(callback_query.from_user.id, "Пока никаких событий нет.")
+
 
 @dp.callback_query_handler(lambda cb: "registrate_to_" in cb.data)
 async def start_registration_callback(callback_query: types.CallbackQuery, state: FSMContext):
@@ -106,7 +109,7 @@ async def start_registration_callback(callback_query: types.CallbackQuery, state
     async with state.proxy() as data:
         data["competition_id"] = competition_id
     
-    await bot.send_message(callback_query.from_user.id, f"Введите ваш никнейм, который вы использутете в игре {game}")
+    await bot.send_message(callback_query.from_user.id, f"Введите ваш никнейм, который вы использутете в игре {game}:")
 
 
 @dp.message_handler(state=RegistrationState.nickname)

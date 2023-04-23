@@ -1,10 +1,8 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
-class JoinState(StatesGroup):
-    name = State()
-    mail = State()
-    nickname = State()
+class QuestionState(StatesGroup):
+    question = State()
 
 
 class CompetitionListState(StatesGroup):

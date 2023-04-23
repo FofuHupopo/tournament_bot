@@ -16,12 +16,29 @@ join_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 join_keyboard.add(signup_btn)
 
 
-competition_list_btn = InlineKeyboardButton("📋 Список турниров", callback_data="competition_list")
+competition_list_btn = InlineKeyboardButton("📋 Список событий", callback_data="competition_list")
+my_registrations_btn = InlineKeyboardButton("🎮 Мои заявки", callback_data="my_registrations")
 profile_btn = InlineKeyboardButton("👤 Профиль", callback_data="profile")
+ask_quetion_btn = InlineKeyboardButton("🗣 Задать вопрос", callback_data="ask_question")
 
-main_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
-main_keyboard.add(competition_list_btn)
+main_keyboard = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
+main_keyboard.add(competition_list_btn, my_registrations_btn)
 main_keyboard.add(profile_btn)
+main_keyboard.add(ask_quetion_btn)
+
+
+profile_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+profile_keyboard.add(*[
+    InlineKeyboardButton("◀️ Назад", callback_data="menu")
+])
+
+
+my_registration_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+my_registration_keyboard.add(*[
+    InlineKeyboardButton("✍️ Поданные", callback_data="submitted_registrations"),
+    InlineKeyboardButton("✅ Одобренные", callback_data="approved_registrations"),
+    InlineKeyboardButton("◀️ Назад", callback_data="menu")
+])
 
 
 competition_prev_btn = InlineKeyboardButton("<<<", callback_data="competition_prev")

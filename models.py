@@ -58,7 +58,7 @@ class RegistrationModel(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
-    is_accepted = Column(Boolean(False))
+    is_accepted = Column(Boolean, default=False)
 
     user = relationship("UserModel")
     competition = relationship("CompetitionModel")
@@ -84,6 +84,22 @@ class RconRuleModel(Base):
     ip = Column(String(127))
     port = Column(Integer)
     password = Column(String(127))
+    
+
+class QuestionModel(Base):
+    __tablename__ = "questions"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    question = Column(Text)
+    answer = Column(Text)
+    date = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+    is_answered = 
+    
+    user = relationship("UserModel")
 
 
 # engine = create_engine("postgresql+pg8000://bot:bot@localhost/tournament")
