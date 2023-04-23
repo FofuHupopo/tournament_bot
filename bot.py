@@ -2,6 +2,7 @@
 import logging
 import json
 import os
+from time import sleep
 from datetime import datetime
 
 from aiogram import Bot, Dispatcher, executor
@@ -22,4 +23,19 @@ from handlers import *
 
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    loop = asyncio.new_event_loop()
+    loop.create_task(send_meme_handler())
+
+    try:
+        executor.start_polling(dp, skip_updates=True, loop=loop)
+    except exceptions.BotBlocked:
+        print("Bot blocked by user")
+    except exceptions.ChatNotFound:
+        print("Chat not found")
+    except exceptions.RetryAfter as e:
+        print(f"Retrying after {e.timeout} seconds.")
+        sleep(e.timeout)
+    except exceptions.TelegramAPIError:
+        print("Error occurred while accessing the Telegram API")
+    finally:
+        loop.stop()

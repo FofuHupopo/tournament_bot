@@ -27,6 +27,14 @@ main_keyboard.add(profile_btn)
 main_keyboard.add(ask_quetion_btn)
 
 
+ask_question_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+ask_question_keyboard.add(*[
+    InlineKeyboardButton("🗣 Спросить", callback_data="ask"),
+    InlineKeyboardButton("📝 Мои вопросы", callback_data="answers"),
+    InlineKeyboardButton("◀️ Назад", callback_data="menu"),
+])
+
+
 profile_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
 profile_keyboard.add(*[
     InlineKeyboardButton("◀️ Назад", callback_data="menu")
@@ -50,10 +58,14 @@ competition_keyboard.row(competition_prev_btn, competition_next_btn)
 
 rcon_btn = InlineKeyboardButton("🖥 RCON", callback_data="admin_rcon")
 competition_btn = InlineKeyboardButton("🎮 События", callback_data="admin_competitions")
+questions_btn = InlineKeyboardButton("❔ Вопросы", callback_data="admin_questions")
+load_meme_btn = InlineKeyboardButton("🖼 Загрузить мем", callback_data="admin_load_meme")
 
 admin_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 admin_keyboard.add(rcon_btn)
 admin_keyboard.add(competition_btn)
+admin_keyboard.add(questions_btn)
+admin_keyboard.add(load_meme_btn)
 
 
 add_rcon_btn = InlineKeyboardButton("🖥 Добавить RCON", callback_data="admin_add_rcon")

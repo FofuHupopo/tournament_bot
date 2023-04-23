@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils import exceptions
 from aiogram.types import InlineKeyboardButton, ReplyKeyboardRemove, InlineKeyboardMarkup
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 from .admin import *
 from .filter import AdminFilter
@@ -17,8 +17,7 @@ from states import (
 )
 from keyboards import (
     go_back_keyboard, admin_competition_keyboard,
-    admin_competition_detail_keyboard, admin_notification_keyboard,
-    admin_view_registrations_keyboard
+    admin_competition_detail_keyboard, admin_notification_keyboard
 )
 
 
@@ -251,14 +250,14 @@ async def send_notification_handler(callback_query: types.CallbackQuery, state: 
             ).filter(
                 RegistrationModel.competition_id == competition_id,
                 RegistrationModel.is_accepted == False
-            ).options(joinedload('registrations')).all()
+            ).all()
         elif callback_query.data == "notificate_participants":
             users = session.query(UserModel.telegram_id).join(
                 RegistrationModel, UserModel.id == RegistrationModel.user_id
             ).filter(
                 RegistrationModel.competition_id == competition_id,
                 RegistrationModel.is_accepted == True
-            ).options(joinedload('registrations')).all()
+            ).all()
         else:
             users = session.query(UserModel.telegram_id).all()
         

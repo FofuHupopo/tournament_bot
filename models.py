@@ -97,7 +97,7 @@ class QuestionModel(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
-    is_answered = 
+    is_answered = Column(Boolean, default=False)
     
     user = relationship("UserModel")
 

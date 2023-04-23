@@ -5,6 +5,14 @@ class QuestionState(StatesGroup):
     question = State()
 
 
+class AnswerState(StatesGroup):
+    answer = State()
+
+
+class LoadMemeState(StatesGroup):
+    meme = State()
+
+
 class CompetitionListState(StatesGroup):
     current_competition = State()
 
