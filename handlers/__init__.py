@@ -1,8 +1,8 @@
-from .join_handlers import *
 from .main_handlers import *
-from .competiotion_handlers import *
+from .user_competition_handlers import *
 from .signup_handler import *
 from .admin import *
+from  .profile_handlers import *
 
 
 @dp.message_handler()

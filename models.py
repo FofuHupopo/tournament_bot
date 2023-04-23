@@ -21,8 +21,8 @@ class UserModel(Base):
     class_number = Column(Integer)
     class_letter = Column(String(1))
     
-    is_active = Column(Boolean(True))
-    is_admin = Column(Boolean(False))
+    is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     
 
     def __str__(self) -> str:

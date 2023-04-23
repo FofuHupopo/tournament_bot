@@ -21,7 +21,7 @@ async def start_signup(callback_query: types.CallbackQuery):
 
 @dp.message_handler(state=UserSignupState.mail)
 async def process_mail(message: types.Message, state: FSMContext):
-    mail = message.text
+    mail = message.text.strip()
     
     if not is_valid_email(message.text):
         await message.reply("Некорректный email. Пожалуйста, введите еще раз.")
@@ -34,7 +34,7 @@ async def process_mail(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=UserSignupState.surname)
 async def process_surname(message: types.Message, state: FSMContext):
-    surname = message.text
+    surname = message.text.strip()
     
     if not surname.isalpha():
         await message.reply("Фамилия должна состоять только из букв. Пожалуйста, введите еще раз.")
@@ -51,7 +51,7 @@ async def process_surname(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=UserSignupState.name)
 async def process_name(message: types.Message, state: FSMContext):
-    name = message.text
+    name = message.text.strip()
     
     if not name.isalpha():
         await message.reply("Имя должно состоять только из букв. Пожалуйста, введите еще раз.")
@@ -68,7 +68,7 @@ async def process_name(message: types.Message, state: FSMContext):
     
 @dp.message_handler(state=UserSignupState.class_number)
 async def process_class_number(message: types.Message, state: FSMContext):
-    class_number = message.text
+    class_number = message.text.strip()
     
     if not class_number.isdigit():
         await message.reply("Номер класса должен быть числом. Пожалуйста, введите еще раз.")
@@ -85,7 +85,7 @@ async def process_class_number(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=UserSignupState.class_letter)
 async def process_class_letter(message: types.Message, state: FSMContext):
-    class_letter = message.text
+    class_letter = message.text.strip()
     
     if not class_letter.isalpha():
         await message.reply("Буква класса должна быть буквой. Пожалуйста, введите еще раз.")

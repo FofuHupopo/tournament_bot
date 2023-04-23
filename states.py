@@ -21,6 +21,11 @@ class AddRconRuleState(StatesGroup):
     server_ip = State()
     server_port = State()
     password = State()
+    
+
+class RegistrationState(StatesGroup):
+    competition_id = State()
+    nickname = State()
 
 
 class CompetitionDetailState(StatesGroup):
@@ -28,6 +33,9 @@ class CompetitionDetailState(StatesGroup):
     name = State()
     description = State()
     date = State()
+    
+    notification = State()
+    registration_number = State()
 
 
 class AddCompetitionState(StatesGroup):

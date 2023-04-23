@@ -17,11 +17,10 @@ join_keyboard.add(signup_btn)
 
 
 competition_list_btn = InlineKeyboardButton("📋 Список турниров", callback_data="competition_list")
-my_registrations_btn = InlineKeyboardButton("📝 Мои заявки", callback_data="my_registrations")
 profile_btn = InlineKeyboardButton("👤 Профиль", callback_data="profile")
 
 main_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
-main_keyboard.add(competition_list_btn, my_registrations_btn)
+main_keyboard.add(competition_list_btn)
 main_keyboard.add(profile_btn)
 
 
@@ -63,7 +62,9 @@ admin_competition_keyboard.add(add_competition_btn)
 
 
 admin_competition_btns = [
-    view_registrations_btn := InlineKeyboardButton("👀 Посмотреть заявки", callback_data="admin_competition_view_registrations"),
+    view_new_registrations_btn := InlineKeyboardButton("📢 Уведомить о событии", callback_data="admin_competition_notificate"),
+    view_new_registrations_btn := InlineKeyboardButton("👀 Новые заявки", callback_data="admin_view_registrations"),
+    view_old_registrations_btn := InlineKeyboardButton("👥 Участники", callback_data="admin_view_participants"),
     edit_name_btn := InlineKeyboardButton("✏️ название", callback_data="admin_competition_edit_name"),
     edit_description_btn := InlineKeyboardButton("✏️ описание", callback_data="admin_competition_edit_description"),
     reschedule_btn := InlineKeyboardButton("🕓 Перенести", callback_data="admin_competition_reschedule"),
@@ -71,17 +72,28 @@ admin_competition_btns = [
 ]
 go_back_btn = InlineKeyboardButton("◀️ Назад", callback_data="admin_go_back_competitions")
 
-admin_competition_detail_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
+admin_competition_detail_keyboard = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
 admin_competition_detail_keyboard.add(admin_competition_btns[0])
-admin_competition_detail_keyboard.add(*admin_competition_btns[1:3])
-admin_competition_detail_keyboard.add(*admin_competition_btns[3:])
+admin_competition_detail_keyboard.add(*admin_competition_btns[1:7])
 admin_competition_detail_keyboard.add(go_back_btn)
 
 
-# a_u_sure_btns = [
-#     yes_btn := InlineKeyboardButton("Да", callback_data="yes_sure"),
-#     no_btn := InlineKeyboardButton("Нет", callback_data="no_sure"),
-# ]
+admin_view_registrations_btns = [
+    InlineKeyboardButton("✅ Одобрить", callback_data="admin_approve_registration"),
+    InlineKeyboardButton("❌ Отклонить", callback_data="admin_reject_registration"),
+    InlineKeyboardButton("◀️ Назад", callback_data="admin_next_registration"),
+]
 
-# a_u_sure_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
-# a_u_sure_keyboard.add(*a_u_sure_btns)
+admin_view_registrations_keyboard = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
+admin_view_registrations_keyboard.add(*admin_competition_btns)
+
+
+admin_notification_bnts = [
+    to_all_btn := InlineKeyboardButton(text="Всем", callback_data="notificate_all"),
+    to_new_btn := InlineKeyboardButton(text="Новым", callback_data="notificate_registrations"),
+    to_members_btn := InlineKeyboardButton(text="Участникам", callback_data="notificate_participants"),
+    go_back_btn := InlineKeyboardButton(text="Назад", callback_data="notificate_go_back"),
+]
+
+admin_notification_keyboard = InlineKeyboardMarkup(resize_keyboards=True, row_width=3)
+admin_notification_keyboard.add(*admin_notification_bnts)
