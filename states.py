@@ -6,6 +6,7 @@ class QuestionState(StatesGroup):
 
 
 class AnswerState(StatesGroup):
+    question_id = State()
     answer = State()
 
 

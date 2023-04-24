@@ -35,6 +35,14 @@ ask_question_keyboard.add(*[
 ])
 
 
+admin_question_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
+admin_question_keyboard.add(*[
+    InlineKeyboardButton("💌 Новые", callback_data="admin_view_questions"),
+    InlineKeyboardButton("📝 Отвеченные", callback_data="admin_answered_questions"),
+    InlineKeyboardButton("◀️ Назад", callback_data="admin")
+])
+
+
 profile_keyboard = InlineKeyboardMarkup(row_width=2, resize_keyboard=True)
 profile_keyboard.add(*[
     InlineKeyboardButton("◀️ Назад", callback_data="menu")

@@ -69,12 +69,15 @@ async def ask_question_callback(message: types.Message, state: FSMContext):
     with Session(engine) as session:
         admins = session.query(UserModel.telegram_id).filter(
             UserModel.is_admin == True
-        ).all
+        ).all()
+        user = session.query(UserModel).filter(
+            UserModel.telegram_id == message.from_user.id
+        ).first()
+
+        admins = list(map(lambda x: int(x[0]), admins))
         
-    admins = list(map(lambda x: int(x[0]), admins))
-    
-    for admin in admins:
-        await bot.send_message(admin, f"Появился новый вопрос от пользователя {user.name} {user.surname} из {user.class_number} {user.class_letter}.")
+        for admin in admins:
+            await bot.send_message(admin, f"Появился новый вопрос от пользователя {user.name} {user.surname} из {user.class_number} {user.class_letter}.")
 
 
 async def view_my_questions(callback_query: types.CallbackQuery, question_id: int):
@@ -120,7 +123,7 @@ async def view_my_questions(callback_query: types.CallbackQuery, question_id: in
         )
         
         await callback_query.message.edit_text(text, reply_markup=keyboard)
-        
+
 
 @dp.callback_query_handler(lambda cb: "view_my_question_" in cb.data)
 async def view_my_question_callback(callback_query: types.CallbackQuery):

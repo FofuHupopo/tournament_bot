@@ -53,6 +53,7 @@ async def send_meme_handler():
         midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
         midday = midnight + timedelta(hours=12, minutes=0)
         
+        
         sleep_time = int((midday - now).total_seconds())
         
         if sleep_time <= 0:

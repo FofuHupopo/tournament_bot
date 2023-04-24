@@ -13,7 +13,7 @@ MESSAGES = json.load(open("messages.json", encoding="utf8"))
 # API_TOKEN = os.getenv("BOT_TOKEN")
 API_TOKEN = "2018923142:AAFRTQXsNLs2GTCR7rVEnSpzo4el1fl7m7E"
 
-logging.basicConfig(level=logging.INFO) #, filename=f"./logs/log-{datetime.utcnow():%Y-%m-%d_%H:%M:%S}.txt")
+logging.basicConfig(level=logging.INFO, filename=f"./logs/log-{datetime.utcnow():%Y-%m-%d_%H:%M:%S}.txt")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -23,7 +23,7 @@ from handlers import *
 
 
 if __name__ == "__main__":
-    loop = asyncio.new_event_loop()
+    loop = asyncio.get_event_loop()
     loop.create_task(send_meme_handler())
 
     try:
