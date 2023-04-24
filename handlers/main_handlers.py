@@ -30,7 +30,7 @@ async def main_handler(message: types.Message):
 
 @dp.message_handler(commands=["help"])
 async def help_handler(message: types.Message):
-    await message.reply(MESSAGES["help"], reply_markup=start_keyboard)
+    await message.reply(MESSAGES["help"])
 
 
 @dp.callback_query_handler(lambda cb: cb.data == "menu")
